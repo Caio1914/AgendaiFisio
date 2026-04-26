@@ -1,63 +1,95 @@
 window.onload = function() {
-    const btnCadastrar = document.getElementById("btnCadastrar");
-    const inputNome = document.getElementById("nomeCadastro");
-    const inputCPF = document.getElementById("cpfCadastro"); // Novo campo de CPF
-    const inputEmail = document.getElementById("emailCadastro");
-    const inputSenha = document.getElementById("senhaCadastro");
-    const URL_API = "http://localhost:8000/register";
+    const el = {
+        btnCadastrar: document.getElementById("btnCadastrar"),
+        inputNome: document.getElementById("nomeCadastro"),
+        inputCPF: document.getElementById("cpf"),
+        inputEmail: document.getElementById("emailCadastro"),
+        inputSenha: document.getElementById("senhaCadastro"),
+        checkLGPD: document.getElementById("checkLGPD"), // Novo elemento
+        URL_API: "http://localhost:8000/register"
+    };
 
-    // --- MÁSCARA DE CPF EM TEMPO REAL ---
-    if (inputCPF) {
-        inputCPF.addEventListener("input", function(e) {
-            let v = e.target.value.replace(/\D/g, ""); // Remove tudo que não é número
+    // --- 1. MÁSCARA DE CPF (Lógica Funcional) ---
+    const aplicarMascaraCPF = (valor) => {
+        return valor
+            .replace(/\D/g, "") // Remove tudo que não é número
+            .replace(/(\d{3})(\d)/, "$1.$2") // Coloca ponto após o 3º dígito
+            .replace(/(\d{3})(\d)/, "$1.$2") // Coloca ponto após o 6º dígito
+            .replace(/(\d{3})(\d{1,2})$/, "$1-$2") // Coloca traço após o 9º dígito
+            .substring(0, 14); // Limita o tamanho total
+    };
 
-            if (v.length <= 11) {
-                v = v.replace(/(\d{3})(\d)/, "$1.$2");
-                v = v.replace(/(\d{3})(\d)/, "$1.$2");
-                v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-            }
-            e.target.value = v;
-            inputCPF.classList.remove("input-erro");
+    if (el.inputCPF) {
+        el.inputCPF.addEventListener("input", (e) => {
+            e.target.value = aplicarMascaraCPF(e.target.value);
+            el.inputCPF.classList.remove("input-erro");
         });
     }
 
-    // --- LÓGICA DE ENVIO DO CADASTRO ---
-    if (btnCadastrar) {
-        btnCadastrar.onclick = async function() {
-            const nome = inputNome.value.trim();
-            const cpfLimpo = inputCPF.value.replace(/\D/g, ""); // Tira pontos e traço para a API
-            const email = inputEmail.value.trim();
-            const senha = inputSenha.value.trim();
+    // --- 2. LÓGICA LGPD (Habilitar Botão) ---
+    if (el.checkLGPD && el.btnCadastrar) {
+        el.checkLGPD.addEventListener("change", () => {
+            el.btnCadastrar.disabled = !el.checkLGPD.checked;
+        });
+    }
 
-            // Validação simples
-            if (!nome || cpfLimpo.length < 11 || !email.includes("@") || senha.length < 6) {
-                alert("⚠️ Verifique os campos:\n- Nome é obrigatório\n- CPF deve estar completo\n- E-mail deve ser válido\n- Senha: mín. 6 caracteres");
-                return;
+    // --- 3. ENVIO DO FORMULÁRIO ---
+    const enviarCadastro = async () => {
+        const dados = {
+            nome: el.inputNome.value.trim(),
+            cpf: el.inputCPF.value.replace(/\D/g, ""), // Limpa para a API
+            email: el.inputEmail.value.trim(),
+            senha: el.inputSenha.value.trim()
+        };
+
+        // Validações
+        if (!dados.nome || dados.cpf.length !== 11 || !dados.email.includes("@") || dados.senha.length < 6) {
+            alert("⚠️ Preencha todos os campos corretamente!");
+            return;
+        }
+
+        try {
+            const response = await fetch(el.URL_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dados)
+            });
+
+            if (response.ok) {
+                alert("✅ Cadastro realizado com sucesso!");
+                window.location.href = "./login.html";
+            } else {
+                const erro = await response.json();
+                alert(erro.detail || "Erro ao cadastrar.");
             }
+        } catch (err) {
+            console.error("Erro:", err);
+            alert("Erro ao conectar com o servidor.");
+        }
+    };
 
-            try {
-                const response = await fetch(URL_API, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        nome: nome,
-                        cpf: cpfLimpo, // Enviando apenas os 11 números
-                        email: email, 
-                        senha: senha 
-                    })
-                });
-
-                if (response.ok) {
-                    alert("✅ Cadastro realizado com sucesso! Faça seu login.");
-                    window.location.href = "./login.html";
-                } else {
-                    const errorData = await response.json();
-                    alert(errorData.detail || "Erro ao cadastrar. Verifique se o CPF ou E-mail já existem.");
-                }
-            } catch (err) {
-                console.error("Erro de conexão:", err);
-                alert("Erro ao conectar com o servidor.");
-            }
+    if (el.btnCadastrar) {
+        el.btnCadastrar.onclick = (e) => {
+            e.preventDefault();
+            enviarCadastro();
         };
     }
 };
+function selecionarPerfil(tipo) {
+    // Adiciona uma pequena animação de clique antes de redirecionar
+    const card = tipo === 'paciente' ? 
+        document.getElementById('cardPaciente') : 
+        document.getElementById('cardProfissional');
+
+    card.style.transform = "scale(0.95)";
+
+    setTimeout(() => {
+        if (tipo === 'paciente') {
+            // Redireciona para a tela de cadastro de paciente
+            window.location.href = "cadastro-paciente.html";
+        } else {
+            // Redireciona para a tela de cadastro de profissional
+            window.location.href = "cadastro-profissional.html";
+        }
+    }, 150);
+}

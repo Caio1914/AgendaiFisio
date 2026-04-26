@@ -3,43 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro - Sistema de Agendamento</title>
-    <link rel="stylesheet" href="estilogeral.css">
+    <title>Escolha seu Perfil - Agendamento</title>
+    <!-- Link corrigido para a fonte Inter (Moderna) -->
+    <link href="https://googleapis.com" rel="stylesheet">
+    <link rel="stylesheet" href="cadastrodeTE.css">
 </head>
 <body>
-    <div class="login-container">
-        <form class="login-box">
-            <h2>Criar Conta</h2>
-            <p>Preencha os dados abaixo</p>
+    <div class="selecao-container">
+        <header class="selecao-header">
+            <h1>Como deseja se cadastrar?</h1>
+            <p>Selecione o perfil ideal para começar sua jornada</p>
+        </header>
 
-            <div class="input-group">
-                <label for="nomeCadastro">Nome Completo</label>
-                <input type="text" id="nomeCadastro" placeholder="Seu nome" class="input-estilizado">
+        <div class="cards-wrapper">
+            <!-- Card Paciente -->
+            <div class="card-perfil paciente">
+                <div class="indicador-cor"></div>
+                <div class="icon-area">👤</div>
+                <h3>Sou Paciente</h3>
+                <p>Quero encontrar especialistas e agendar minhas consultas de forma rápida.</p>
+                
+                <!-- Link para a página de cadastro do paciente -->
+                <a href="cadastroPaciente.html" class="btn-selecionar">Começar como Paciente</a>
             </div>
 
-          <div class="input-group">
-    <div class="passo">
-       <div class="input-group">
-    <label for="cpfCadastro">CPF</label>
-    <input type="text" id="cpfCadastro" placeholder="000.000.000-00" maxlength="14" class="input-estilizado">
-</div>
-
-    </div>
-</div>
-
-
-            <div class="input-group">
-                <label for="senhaCadastro">Senha</label>
-                <input type="password" id="senhaCadastro" placeholder="Mínimo 6 caracteres" class="input-estilizado">
+            <!-- Card Terapeuta/Médico -->
+            <div class="card-perfil profissional">
+                <div class="indicador-cor"></div>
+                <div class="icon-area">🩺</div>
+                <h3>Sou Profissional</h3>
+                <p>Quero gerenciar meus pacientes, horários e organizar minha clínica.</p>
+                
+                <!-- Link para a página de cadastro do terapeuta -->
+                <a href="cadastroTerapeuta.html" class="btn-selecionar">Começar como Profissional</a>
             </div>
+        </div> <!-- Fim da cards-wrapper -->
+    </div> <!-- Fim da selecao-container (Esta tag faltava no seu código) -->
 
-            <button type="button" id="btnCadastrar" class="btn-auth">Cadastrar</button>
-            
-            <div class="auth-footer">
-                <span>Já tem conta? <a href="./login.html">Fazer Login</a></span>
-            </div>
-        </form>
-    </div>
+    <!-- Se for apenas navegação, o cadastro.js pode não ser necessário nesta tela, 
+         mas mantive caso tenha animações de entrada -->
     <script src="cadastro.js"></script>
 </body>
 </html>
